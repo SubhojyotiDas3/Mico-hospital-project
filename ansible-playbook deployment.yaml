@@ -1,0 +1,35 @@
+- name: Build and Deply Docker Container
+  hosts: dockerservers
+  gather_facts: false
+  remote_user: root
+  tasks:
+#    - name: Copy the file to remote server
+#      shell: scp -r /var/lib/jenkins/workspace/ansible-jenkins-pipeline/ root@172.31.3.213:~/project/
+
+    - name: Building Docker Image
+      docker_image:
+        name: mico:latest
+        source: build
+        build:
+          path: ~/project
+        state: present
+
+    - name: Stopping the Container
+      docker_container:
+        name: mico-container
+        image: mico:latest
+        state: stopped
+
+    - name: Removing the Container
+      docker_container:
+        name: mico-container
+        image: mico:latest
+        state: absent
+
+    - name: Creating the Container
+      docker_container:
+        name: mico-container
+        image: mico:latest
+        ports:
+          - "80:80"
+        state: started
